@@ -8,7 +8,7 @@ import java.util.concurrent.Executors;
 
 public class WeaverServer {
     
-    private static final int DEFAULT_PORT_NUMBER = 8080;
+    private static final int DEFAULT_PORT_NUMBER = 80;
     private static final int NUMBER_OF_THREADS = 10;
     
     private int port;
