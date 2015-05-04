@@ -18,8 +18,6 @@ public class WeaverServer {
     private static final int NUMBER_OF_TREHAD = 10;
 
     private SelectorListener acceptListener;
-    private SelectorListener readListener;
-    private boolean isReadListenerRunning;
     
     private ExecutorService executorService;
 
@@ -29,7 +27,6 @@ public class WeaverServer {
         executorService = Executors.newFixedThreadPool(NUMBER_OF_TREHAD);
         
         acceptListener = new SelectorListener();
-        readListener = new SelectorListener();
 
         ServerSocketChannel serverSocketChannel = ServerSocketChannel.open();
         serverSocketChannel.configureBlocking(false);
@@ -50,9 +47,6 @@ public class WeaverServer {
             port = DEFAULT_PORT_NUMBER;
     }
     
-    public boolean isReadThreadRunning() {
-        return isReadListenerRunning;
-    }
 
     public static void main(String[] args) {
         WeaverServer server = new WeaverServer();
@@ -101,23 +95,10 @@ public class WeaverServer {
             if (key.isAcceptable()) {
                 ServerSocketChannel ssc = (ServerSocketChannel) key.channel();
                 SocketChannel sc = ssc.accept();
-                //sc.configureBlocking(false);
-                
+
                 Socket sock = sc.socket();
                 executorService.submit(new HttpRequestHandler(sock));
-                //sc.register(readListener.getSelector(), SelectionKey.OP_READ);
                 
-                
-                if (!isReadThreadRunning()) {
-                    isReadListenerRunning = true;
-                    Thread readThread = new Thread(readListener);
-                    readThread.start();
-                }
-            }
-            else if (key.isReadable()) {
-                SocketChannel sc = (SocketChannel) key.channel();
-                Socket sock = sc.socket();
-                executorService.submit(new HttpRequestHandler(sock));
             }
         }
 
